@@ -257,24 +257,28 @@ with abajo_izq:
     st.pyplot(fig)
 
 with abajo_der:
-    st.subheader("Promedio por mes y año")
-    calor = principal.pivot_table(index="Anio", columns="Mes",
-                                  values="Valor", aggfunc="mean")
-
+    st.subheader("Distribución de variaciones diarias")
     fig, ax = plt.subplots(figsize=(6, 3.4))
-    imagen = ax.imshow(calor, cmap="YlGnBu", aspect="auto")
-    fig.colorbar(imagen, ax=ax)
-    ax.set_xticks(range(len(calor.columns)))
-    ax.set_xticklabels(["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul",
-                        "Ago", "Sep", "Oct", "Nov", "Dic"][:len(calor.columns)])
-    ax.set_yticks(range(len(calor.index)))
-    ax.set_yticklabels(calor.index)
-    ax.grid(False)
+    sns.histplot(
+        data=porAnio,
+        x="Variacion",
+        bins=35,
+        kde=True,
+        color=AZUL,
+        ax=ax,
+    )
+    media_var = porAnio["Variacion"].mean()
+    ax.axvline(0, color="gray", linewidth=1, linestyle="--", label="Sin cambio (0%)")
+    ax.axvline(media_var, color=ROJO, linewidth=1.5, label=f"Promedio ({media_var:.3f}%)")
+    ax.set_xlabel("Variación diaria (%)")
+    ax.set_ylabel("Frecuencia (días)")
+    ax.legend(frameon=False)
     st.pyplot(fig)
-    st.caption("Escala secuencial: el valor tiene orden pero no un cero "
-               "con significado, así que no va divergente.")
-
-
+    st.caption(
+        "Muestra la concentración de los cambios diarios: entre más ancha la campana, "
+        "mayor volatilidad tuvo la serie en el periodo."
+    )
+    
 # ─── Datos ─────────────────────────────────────────────────────────────
 with st.expander("Ver y descargar los datos"):
     st.write("Días marcados como N/E por serie:", faltantes)
